@@ -1,0 +1,12 @@
+body{
+    
+    background-color:#00F0000;
+}
+canvas{
+    width: 90%;
+    height: 95%;
+    display: block;
+    margin: 0 auto;
+    z-index: 0;
+    background-color:black;
+}
