@@ -3,18 +3,23 @@ var backRed = 0;
 var backGreen = 255;
 var backBlue = 255;
 var scene = 0;
-var gameCode = prompt("What do you want the game tag to be?");
 var gameStage = -1;
 var displayText = "";
 var townName;
 var funTextState = 0;
 var realText;
+var personKilled;
+//var love???
 
 var story = [personKilled + "was netflix and chillin with their imaginary bae. The movie paused and some laughing was heard. ‘I guess you guys are gonna be netflix and DEAD!’"," "+personKilled+" was out seeing Star Wars Epsiode 3.14: The Force Goes to Sleep. Out of no where the movie went off. The movie was replaced with static like on an old tv. "+personKilled+" tried to get up but all the doors were locked! The static went off and all the lights in the theater went into strobe mode. *FLASH* "+personKilled+" sees the mafia, 20 feet away! *FLASH* 10 Feet AWAY! *FLASH* 2 FEET AWAY!!!!! ,", "another story,"];
 
 var save = ["  luckily the angel yelled ‘watch out’ and "+personKilled+" escaped with bae","Just as the mafia was about to kill "+personKilled+", the Star Wars theme started to play! And like a majestical unicorn the angel flew in with a lightsaber in hand screaming 'IT'S A TRAP'! The angel drew their lightsaber and hit the mafia's left arm off! The mafia then dissapeared. The angel said 'may the force be with you' to "+personKilled+" ", "  another save"];
 
 var dead = [ "And just like that "+personKilled+" and Bae, were dead.","The mafia was one foot away and said '"+personKilled+", I am your father'! 'NOOOOOOOOOOOO' "+personKilled+" said as their head was decappitated.","some other death"];
+
+
+
+
 
 function setup(){
     createCanvas(displayWidth, displayHeight);
@@ -47,10 +52,10 @@ function titleScreen(){
   var textS = 36;
   textSize(textS);
   text(displayText,centerText(textS,displayText),textS);
-  displayText="This Game Tag is: "+gameCode;
-  text(displayText,centerText(textS,displayText),(displayHeight/2)-textS);
   displayText = "Press Enter to continue";
   text(displayText,centerText(textS,displayText),(displayHeight-(textS*5)));
+  var gameCodeAttempt = document.getElementById("gameCode");
+  
 }
 
 function drawGame(){
@@ -123,4 +128,14 @@ function funText(){
     }
   }
   setTimeout(funText, 35);
+}
+
+function removeElement(divNum) {
+
+  var d = document.getElementById('gameCode');
+
+  var olddiv = document.getElementById(divNum);
+
+  d.removeChild(olddiv);
+
 }
