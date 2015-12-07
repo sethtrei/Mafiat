@@ -18,7 +18,7 @@ var myFirebaseRef = new Firebase("https://xgamedatax.firebaseio.com/");
 
 
 function setup(){
-    createCanvas(displayWidth, displayHeight);
+    createCanvas(400, 500);
     back();
 }
 
@@ -34,7 +34,7 @@ function draw(){
 }
 
 function windowResized() {
-  resizeCanvas(displayWidth, displayHeight);
+  resizeCanvas(400, 500);
   background(0,255,255);
 }
 
@@ -45,11 +45,11 @@ function back(){
 function titleScreen(){
   fill(255,0,0);
   var displayText = "Ma Fiat.  I mean Mafia.";
-  var textS = 36;
+  var textS = 18;
   textSize(textS);
-  text(displayText,centerText(textS,displayText),textS);
-  displayText = "Press Enter to continue";
-  text(displayText,centerText(textS,displayText),(displayHeight-(textS*5)));
+  text(displayText,centerText(textS*2,displayText),textS);
+  //displayText = "Press Enter to continue";
+  //text(displayText,centerText(textS,displayText),(500-(textS*5)));
   var gameCodeAttempt = document.getElementById("gameCode");
   
 }
@@ -63,19 +63,19 @@ function drawGame(){
   }
   fill(255,0,0);
   textSize(36);
-  text(realText,0,(displayHeight/4),displayWidth,(displayHeight/4)*3);
+  text(realText,0,(500/4),400,(500/4)*3);
 }
 
 function centerText(textS, displayText){
-  return((windowWidth/2)-((displayText.length/2)*(textS/2.7)));
+  return((500/2)-((displayText.length/2)*(textS/2.7)));
 }
 
 function keyPressed(){
   if(keyCode===ENTER||keyCode===RETURN){
     switch(scene){
       case 0:
-        runGame();
-        scene=1;
+        //runGame();
+        //scene=1;
         break;
       case 1:
         break;
@@ -84,8 +84,8 @@ function keyPressed(){
 }
 
 function runGame(){
-  gameStage++;
-  gameStages();  
+  //gameStage++;
+  //gameStages();  
 }
 
 function gameStages(){
@@ -112,6 +112,7 @@ function villageName(){
   var five2 = (String.fromCharCode(five)).toLowerCase();
   townName = one2+two2+three2+four2+five2+" City";
 }
+
 
 function funText(){
   funTextState++;
