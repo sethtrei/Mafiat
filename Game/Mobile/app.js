@@ -9,16 +9,12 @@ var townName;
 var funTextState = 0;
 var realText;
 var personKilled;
+var username;
+var gameCodeAttempt;
+var newRef;
+
+var myFirebaseRef = new Firebase("https://xgamedatax.firebaseio.com/");
 //var love???
-
-var story = [personKilled + "was netflix and chillin with their imaginary bae. The movie paused and some laughing was heard. ‘I guess you guys are gonna be netflix and DEAD!’"," "+personKilled+" was out seeing Star Wars Epsiode 3.14: The Force Goes to Sleep. Out of no where the movie went off. The movie was replaced with static like on an old tv. "+personKilled+" tried to get up but all the doors were locked! The static went off and all the lights in the theater went into strobe mode. *FLASH* "+personKilled+" sees the mafia, 20 feet away! *FLASH* 10 Feet AWAY! *FLASH* 2 FEET AWAY!!!!! ,", "another story,"];
-
-var save = ["  luckily the angel yelled ‘watch out’ and "+personKilled+" escaped with bae","Just as the mafia was about to kill "+personKilled+", the Star Wars theme started to play! And like a majestical unicorn the angel flew in with a lightsaber in hand screaming 'IT'S A TRAP'! The angel drew their lightsaber and hit the mafia's left arm off! The mafia then dissapeared. The angel said 'may the force be with you' to "+personKilled+" ", "  another save"];
-
-var dead = [ "And just like that "+personKilled+" and Bae, were dead.","The mafia was one foot away and said '"+personKilled+", I am your father'! 'NOOOOOOOOOOOO' "+personKilled+" said as their head was decappitated.","some other death"];
-
-
-
 
 
 function setup(){
@@ -130,12 +126,27 @@ function funText(){
   setTimeout(funText, 35);
 }
 
-function removeElement(divNum) {
+$(document).ready(function(){
+    $("#remover").click(function(){
+        gameCodeAttempt = $('#gameCodeAttempt').val();
+        username = $('#username').val();
+        $('#gameCode').remove();
+        userInit();
+    });
+});
 
-  var d = document.getElementById('gameCode');
-
-  var olddiv = document.getElementById(divNum);
-
-  d.removeChild(olddiv);
-
+function userInit(){
+  var anotherRef = new Firebase("https://xgamedatax.firebaseio.com/mafia/");
+  anotherRef.child("gameCode").on("value", function(snapshot){
+    alert(snapshot.val());
+    if(snapshot.val()===gameCodeAttempt){
+      newRef = new Firebase("https://xgamedatax.firebaseio.com/mafia/players/"+username+"/");
+      newRef.update({
+        alive:true
+      });
+      alert("You are in!  Please wait...")
+    } else {
+      alert("incorrect Game Code.  Sorry M8, but you have to refresh to try again.  REKT")
+    }
+  });
 }
