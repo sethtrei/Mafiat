@@ -10,6 +10,9 @@ var townName;
 var funTextState = 0;
 var realText;
 var myFirebaseRef = new Firebase("https://xgamedatax.firebaseio.com/");
+var playerAmt = 0;
+var mafiaRef;
+var players = [];
 
 var story = [personKilled + "was netflix and chillin with their imaginary bae. The movie paused and some laughing was heard. ‘I guess you guys are gonna be netflix and DEAD!’", personKilled+" was out seeing Star Wars Epsiode 3.14: The Force Goes to Sleep. Out of no where the movie went off. The movie was replaced with static like on an old tv. "+personKilled+" tried to get up but all the doors were locked! The static went off and all the lights in the theater went into strobe mode. *FLASH* "+personKilled+" sees the mafia, 20 feet away! *FLASH* 10 Feet AWAY! *FLASH* 2 FEET AWAY!!!!! ", personKilled+" was at his schools computer science club programming a game called aifam, when the club leader, Daniel Bogman came over and whispered to "+personKilled, "Dude", ""];
 
@@ -23,11 +26,14 @@ function setup(){
   myFirebaseRef.set({
     mafia:{
       gameCode:gameCode,
+      playerCount:0,
+      gameState:"join",
       players:{
         player0:0
       }
     }
   });
+  updatePlayerCount();
 }
 
 
@@ -59,12 +65,15 @@ function titleScreen(){
   text(displayText,centerText(textS,displayText),textS);
   displayText="This Game Tag is: "+gameCode;
   text(displayText,centerText(textS,displayText),(displayHeight/2)-textS);
-  displayText = "Press Enter to continue";
-  text(displayText,centerText(textS,displayText),(displayHeight-(textS*5)));
+  if(playerAmt>3){
+    displayText = "Press Enter to continue";
+    text(displayText,centerText(textS,displayText),(displayHeight-(textS*5)));
+  }
 }
 
 function drawGame(){
   back();
+  //acts as reset
   if(funTextState===0){
     realText="";
     funTextState = 0;
@@ -83,8 +92,17 @@ function keyPressed(){
   if(keyCode===ENTER||keyCode===RETURN){
     switch(scene){
       case 0:
-        runGame();
-        scene=1;
+        if(playerAmt>3){
+          runGame();
+          scene=1;
+          mafiaRef = new Firebase("https://xgamedatax.firebaseio.com/mafia/");
+          mafiaRef.update({
+            gameState: "inGame"
+          });
+          setTimeout(setGameState,7790,"roles");
+          findPlayers();
+          setTimeout(assignRoles,2000);
+        }
         break;
       case 1:
         break;
@@ -101,7 +119,7 @@ function gameStages(){
   switch(gameStage){
     case 0:
       villageName();
-      displayText = "Let us begin our story in "+townName+", where the citizens are about to lay their heads to rest.  They looked at their cellular devices with glee to see if they held a special role in the game... Keep your role a secret... Whatever it is...";
+      displayText = "Let us begin our story in "+townName+", where the citizens are about to lay their heads to rest.  They looked at their cellular devices with glee to see if they held a special role in the game...";
       break;
     case 1:
       break;
@@ -133,4 +151,63 @@ function funText(){
     }
   }
   setTimeout(funText, 35);
+}
+
+function updatePlayerCount(){
+  var anotherRef = new Firebase("https://xgamedatax.firebaseio.com/mafia/");
+  anotherRef.child("playerCount").on("value", function(snapshot){
+    playerAmt = snapshot.val();  
+  });
+  setTimeout(updatePlayerCount, 5000);
+}
+
+function setGameState(state){
+  mafiaRef.update({
+    gameState:state
+  });
+}
+
+function assignRoles(){
+  var playerMafia = Math.floor(Math.random()*(playerAmt));
+  if(playerMafia==playerAmt){
+    playerMafia--;
+  }
+  var mafiaName = players[playerMafia];
+  do{
+    var playerNurse = Math.floor(Math.random()*(playerAmt));
+    if(playerNurse==playerAmt){
+      playerNurse--;
+    }
+  } while(playerNurse === playerMafia)
+  var nurseName = players[playerNurse];
+  for(var i = 0; i < playerAmt; i++){
+    var coolRef = new Firebase("https://xgamedatax.firebaseio.com/mafia/players/"+players[i]);
+    switch(players[i]){
+      case mafiaName:
+        var currentRole = "mafia";
+        break;
+      case nurseName:
+        var currentRole = "nurse";
+        break;
+      default:
+        var currentRole = "civilian";
+    }
+    coolRef.update({
+      role: currentRole
+    });
+  }
+}
+
+function findPlayers(){
+  var playerRef = new Firebase("https://xgamedatax.firebaseio.com/mafia/players/");
+  playerRef.once("value", function(snapshot) {
+    var amountOfPlayers=0;
+    players = [];
+    snapshot.forEach(function(childSnapshot){
+      var key = childSnapshot.key();
+      players.push(childSnapshot.key());
+      amountOfPlayers++;
+    });
+  });
+  setTimeout(findPlayers,5000);
 }

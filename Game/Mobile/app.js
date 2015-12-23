@@ -12,6 +12,13 @@ var personKilled;
 var username;
 var gameCodeAttempt;
 var newRef;
+var playerCount = 0;
+var playerAmt = 0;
+var players = [];
+var inGame = false;
+var gameState;
+var oldGameState = 0;
+var role = "person";
 
 var myFirebaseRef = new Firebase("https://xgamedatax.firebaseio.com/");
 //var love???
@@ -20,6 +27,9 @@ var myFirebaseRef = new Firebase("https://xgamedatax.firebaseio.com/");
 function setup(){
     createCanvas(400, 500);
     back();
+    findPlayers();
+    updatePlayerCount();
+    getGameState();
 }
 
 function draw(){
@@ -31,6 +41,7 @@ function draw(){
         drawGame();
         break;
     }
+    event();
 }
 
 function windowResized() {
@@ -137,17 +148,153 @@ $(document).ready(function(){
 });
 
 function userInit(){
+  if(gameState === "join"){
+    var anotherRef = new Firebase("https://xgamedatax.firebaseio.com/mafia/");
+    anotherRef.child("gameCode").on("value", function(snapshot){
+      if(snapshot.val()===gameCodeAttempt){
+        newRef = new Firebase("https://xgamedatax.firebaseio.com/mafia/players/"+username+"/");
+        newRef.update({
+          alive:true
+        });
+        alert("You are in!  Please wait...")
+        inGame = true;
+        anotherRef.child("playerCount").once("value", function(snap){
+          var players = snap.val()
+          anotherRef.update({
+            playerCount : (players+1)
+          });
+          playerCount = players+1;
+        });
+      } else {
+        alert("Incorrect Game Code.  Sorry M8, but you have to refresh to try again.  REKT")
+      }
+      removePlayer0();
+      findPlayers();
+    });
+  } else {
+    alert("Sorry, the game is already in session");
+  }
+}
+
+function selectPlayer(){
+  // use .appendChild() with jQuery
+  // look it up on w3
+  //also look up nodes
   var anotherRef = new Firebase("https://xgamedatax.firebaseio.com/mafia/");
-  anotherRef.child("gameCode").on("value", function(snapshot){
-    alert(snapshot.val());
-    if(snapshot.val()===gameCodeAttempt){
-      newRef = new Firebase("https://xgamedatax.firebaseio.com/mafia/players/"+username+"/");
-      newRef.update({
-        alive:true
-      });
-      alert("You are in!  Please wait...")
-    } else {
-      alert("incorrect Game Code.  Sorry M8, but you have to refresh to try again.  REKT")
-    }
+  for(var i = 0; i < playerAmt; i++){
+    var name = "#player"+(i+1);
+    $(name).removeAttr("hidden");
+  }
+}
+
+function removePlayerSelector(){
+  for(var i = 0; i < playerAmt; i++){
+    var button = document.getElementsByTagName("button")[i];
+    var att = document.createAttribute("hidden");
+    button.setAttributeNode(att);
+  }
+}
+
+function labelPlayers(){
+  for(var i = 0; i < playerAmt; i++){
+    var h = document.getElementsByTagName("button")[i];
+    var anotherNewRef = new Firebase("https://xgamedatax.firebaseio.com/mafia/players/"+username+"/");
+    
+    var t = document.createTextNode();
+    h.appendChild(t);
+  }
+}
+//http://tinyurl.com/firebaseStuffzPlzLOL
+//use .forEach from firebase
+
+function findPlayers(){
+  var playerRef = new Firebase("https://xgamedatax.firebaseio.com/mafia/players/");
+  playerRef.once("value", function(snapshot) {
+    var amountOfPlayers=0;
+    players = [];
+    snapshot.forEach(function(childSnapshot){
+      var key = childSnapshot.key();
+      players.push(childSnapshot.key());
+      amountOfPlayers++;
+    });
   });
+  setTimeout(updateButtons,1000);
+  setTimeout(findPlayers,5000);
+}
+
+function updateButtons(){
+  for(var i = 0; i < players.length; i++){
+    var btnName = "#player"+(i+1);
+    $(btnName).text(players[i]);
+  }
+  labelPlayers();
+}
+
+function removePlayer0(){
+  var player0Ref = new Firebase("https://xgamedatax.firebaseio.com/mafia/players/player0");
+  player0Ref.remove();
+}
+
+function updatePlayerCount(){
+   var anotherRef = new Firebase("https://xgamedatax.firebaseio.com/mafia/");
+    anotherRef.child("playerCount").on("value", function(snapshot){
+      playerAmt = snapshot.val();
+    });
+    setTimeout(updatePlayerCount, 5000);
+}
+
+function getGameState(){
+  var anotherRef = new Firebase("https://xgamedatax.firebaseio.com/mafia/");
+  anotherRef.child("gameState").on("value", function(snapshot){
+    gameState = snapshot.val();
+  });
+  setTimeout(getGameState,1000);
+}
+
+function event(){
+  if(oldGameState!=0){
+    if(oldGameState!=gameState){
+      switch(gameState){
+        case "inGame":
+          removePlayerSelector();
+          break;
+        case "mafia":
+          if(role === "mafia"){
+            selectPlayer();
+          }
+          break;
+        case "nurse":
+          break;
+        case "vote":
+          break;
+        case "roles":
+          findPlayers();
+          //it's weird, but it only works if you call it twice
+          getRole();
+          getRole();
+          setTimeout(reportRole,2000);
+          break;
+        default:
+          if(gameState!="join"){
+            console.log("Unknown Gamestate: "+gameState);
+          }
+      }
+    }
+  }
+  oldGameState = gameState;
+}
+
+function getRole(){
+  var thisRef = new Firebase("https://xgamedatax.firebaseio.com/mafia/players/"+username);
+  thisRef.child("role").on("value",function (snapshot){
+    role = snapshot.val();
+  });
+}
+
+function reportRole(){
+  if(role === "civilian"){
+    alert("You are a civilian");
+  } else {
+    alert("You are the "+role+"!");
+  }
 }

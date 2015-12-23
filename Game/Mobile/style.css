@@ -14,3 +14,9 @@ canvas{
 input{
     text-align:center;
 }
+button{
+    border-radius:25%;
+    color:#00FF00;
+    background-color:black;
+    margin:0 auto;
+}
