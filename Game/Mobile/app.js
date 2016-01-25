@@ -264,8 +264,12 @@ function event(){
           }
           break;
         case "nurse":
+          if(role=== "nurse"){
+            selectPlayer();
+          }
           break;
         case "vote":
+          selectPlayer();
           break;
         case "roles":
           findPlayers();

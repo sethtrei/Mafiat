@@ -102,6 +102,7 @@ function keyPressed(){
           setTimeout(setGameState,7790,"roles");
           findPlayers();
           setTimeout(assignRoles,2000);
+          setTimeout(setGameState,10000,"mafia");
         }
         break;
       case 1:
